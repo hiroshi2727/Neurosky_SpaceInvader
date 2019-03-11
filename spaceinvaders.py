@@ -7,11 +7,16 @@ from pygame import *
 import sys
 from os.path import abspath, dirname
 from random import choice
+from neurpy import Neuropy
+from time import sleep
 
 BASE_PATH = abspath(dirname(__file__))
 FONT_PATH = BASE_PATH + '/fonts/'
 IMAGE_PATH = BASE_PATH + '/images/'
 SOUND_PATH = BASE_PATH + '/sounds/'
+
+# Neuropy port
+PORT = 'COM4'
 
 # Colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -352,11 +357,97 @@ class SpaceInvaders(object):
         self.enemy4Text = Text(FONT, 25, '   =  ?????', RED, 368, 420)
         self.scoreText = Text(FONT, 20, 'Score', WHITE, 5, 5)
         self.livesText = Text(FONT, 20, 'Lives ', WHITE, 640, 5)
+        # Display attention value on screen !!change x position
+        self.attentionText = Text(FONT, 20, 'Attention', WHITE, 300, 5)
 
         self.life1 = Life(715, 3)
         self.life2 = Life(742, 3)
         self.life3 = Life(769, 3)
         self.livesGroup = sprite.Group(self.life1, self.life2, self.life3)
+
+        # Neuropy object to extract brainwave value
+        self.neuropy = Neuropy(PORT, 6400)
+        self.neuropy.start()
+
+    def main(self):
+        while True:
+            # Main title screen
+            if self.mainScreen:
+                self.screen.blit(self.background, (0, 0))
+                self.titleText.draw(self.screen)
+                self.titleText2.draw(self.screen)
+                self.enemy1Text.draw(self.screen)
+                self.enemy2Text.draw(self.screen)
+                self.enemy3Text.draw(self.screen)
+                self.enemy4Text.draw(self.screen)
+                self.create_main_menu()
+                for e in event.get():
+                    if self.should_exit(e):
+                        sys.exit()
+                    if e.type == KEYUP:
+                        # Only create blockers on a new game, not a new round
+                        self.allBlockers = sprite.Group(self.make_blockers(0),
+                                                        self.make_blockers(1),
+                                                        self.make_blockers(2),
+                                                        self.make_blockers(3))
+                        self.livesGroup.add(self.life1, self.life2, self.life3)
+                        self.reset(0)
+                        self.startGame = True
+                        self.mainScreen = False
+            # Game Plaing screen
+            elif self.startGame:
+                # When winning game and going to next round
+                if not self.enemies and not self.explosionsGroup:
+                    currentTime = time.get_ticks()
+                    if currentTime - self.gameTimer < 3000:
+                        self.screen.blit(self.background, (0, 0))
+                        self.scoreText2 = Text(FONT, 20, str(self.score),
+                                               GREEN, 85, 5)
+                        self.scoreText.draw(self.screen)
+                        self.scoreText2.draw(self.screen)
+                        self.nextRoundText.draw(self.screen)
+                        self.livesText.draw(self.screen)
+                        self.livesGroup.update()
+                        self.check_input()
+                    if currentTime - self.gameTimer > 3000:
+                        # Move enemies closer to bottom
+                        self.enemyPosition += ENEMY_MOVE_DOWN
+                        self.reset(self.score)
+                        self.gameTimer += 3000
+                # While playing actual game
+                else:
+                    currentTime = time.get_ticks()
+                    self.play_main_music(currentTime)
+                    self.screen.blit(self.background, (0, 0))
+                    self.allBlockers.update(self.screen)
+                    self.scoreText2 = Text(FONT, 20, str(self.score), GREEN,
+                                           85, 5)
+                    self.scoreText.draw(self.screen)
+                    self.scoreText2.draw(self.screen)
+                    # Draw neuropy text and value
+                    self.attentionText2 = Text(FONT, 20,
+                                            str(self.neuropy.attention), GREEN,
+                                            380, 5)
+                    self.attentionText.draw(self.screen)
+                    self.attentionText2.draw(self.screen)
+
+                    self.livesText.draw(self.screen)
+                    self.check_input()
+                    self.enemies.update(currentTime)
+                    self.allSprites.update(self.keys, currentTime)
+                    self.explosionsGroup.update(currentTime)
+                    self.check_collisions()
+                    self.create_new_ship(self.makeNewShip, currentTime)
+                    self.make_enemies_shoot()
+            # When losing game
+            elif self.gameOver:
+                currentTime = time.get_ticks()
+                # Reset enemy starting position
+                self.enemyPosition = ENEMY_DEFAULT_POSITION
+                self.create_game_over(currentTime)
+
+            display.update()
+            self.clock.tick(60)
 
     def reset(self, score):
         self.player = Ship()
@@ -421,7 +512,7 @@ class SpaceInvaders(object):
         return evt.type == QUIT or (evt.type == KEYUP and evt.key == K_ESCAPE)
 
     def check_input(self):
-        self.keys = key.get_pressed()
+        self.keys = key.get_pressed()   # Change this part to blink value
         for e in event.get():
             if self.should_exit(e):
                 sys.exit()
@@ -567,76 +658,6 @@ class SpaceInvaders(object):
         for e in event.get():
             if self.should_exit(e):
                 sys.exit()
-
-    def main(self):
-        while True:
-            if self.mainScreen:
-                self.screen.blit(self.background, (0, 0))
-                self.titleText.draw(self.screen)
-                self.titleText2.draw(self.screen)
-                self.enemy1Text.draw(self.screen)
-                self.enemy2Text.draw(self.screen)
-                self.enemy3Text.draw(self.screen)
-                self.enemy4Text.draw(self.screen)
-                self.create_main_menu()
-                for e in event.get():
-                    if self.should_exit(e):
-                        sys.exit()
-                    if e.type == KEYUP:
-                        # Only create blockers on a new game, not a new round
-                        self.allBlockers = sprite.Group(self.make_blockers(0),
-                                                        self.make_blockers(1),
-                                                        self.make_blockers(2),
-                                                        self.make_blockers(3))
-                        self.livesGroup.add(self.life1, self.life2, self.life3)
-                        self.reset(0)
-                        self.startGame = True
-                        self.mainScreen = False
-
-            elif self.startGame:
-                if not self.enemies and not self.explosionsGroup:
-                    currentTime = time.get_ticks()
-                    if currentTime - self.gameTimer < 3000:
-                        self.screen.blit(self.background, (0, 0))
-                        self.scoreText2 = Text(FONT, 20, str(self.score),
-                                               GREEN, 85, 5)
-                        self.scoreText.draw(self.screen)
-                        self.scoreText2.draw(self.screen)
-                        self.nextRoundText.draw(self.screen)
-                        self.livesText.draw(self.screen)
-                        self.livesGroup.update()
-                        self.check_input()
-                    if currentTime - self.gameTimer > 3000:
-                        # Move enemies closer to bottom
-                        self.enemyPosition += ENEMY_MOVE_DOWN
-                        self.reset(self.score)
-                        self.gameTimer += 3000
-                else:
-                    currentTime = time.get_ticks()
-                    self.play_main_music(currentTime)
-                    self.screen.blit(self.background, (0, 0))
-                    self.allBlockers.update(self.screen)
-                    self.scoreText2 = Text(FONT, 20, str(self.score), GREEN,
-                                           85, 5)
-                    self.scoreText.draw(self.screen)
-                    self.scoreText2.draw(self.screen)
-                    self.livesText.draw(self.screen)
-                    self.check_input()
-                    self.enemies.update(currentTime)
-                    self.allSprites.update(self.keys, currentTime)
-                    self.explosionsGroup.update(currentTime)
-                    self.check_collisions()
-                    self.create_new_ship(self.makeNewShip, currentTime)
-                    self.make_enemies_shoot()
-
-            elif self.gameOver:
-                currentTime = time.get_ticks()
-                # Reset enemy starting position
-                self.enemyPosition = ENEMY_DEFAULT_POSITION
-                self.create_game_over(currentTime)
-
-            display.update()
-            self.clock.tick(60)
 
 
 if __name__ == '__main__':
