@@ -16,7 +16,8 @@ IMAGE_PATH = BASE_PATH + '/images/'
 SOUND_PATH = BASE_PATH + '/sounds/'
 
 # Neuropy port
-PORT = 'COM4'
+PORT1 = 'COM4'
+PORT2 = 9600
 
 # Colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -366,7 +367,7 @@ class SpaceInvaders(object):
         self.livesGroup = sprite.Group(self.life1, self.life2, self.life3)
 
         # Neuropy object to extract brainwave value
-        self.neuropy = Neuropy(PORT, 6400)
+        self.neuropy = Neuropy(PORT1, PORT2)
         self.neuropy.start()
 
     def main(self):
