@@ -9,6 +9,7 @@ from os.path import abspath, dirname
 from random import choice
 from NeuroPy import NeuroPy
 from time import sleep
+import random
 
 BASE_PATH = abspath(dirname(__file__))
 FONT_PATH = BASE_PATH + '/fonts/'
@@ -345,12 +346,13 @@ class SpaceInvaders(object):
         self.startGame = False
         self.mainScreen = True
         self.gameOver = False
+        self.mathScreen = False
 
         # Initial values for attention and meditation thresholds
         self.attThreshold = 0
         self.medThreshold = 0
         self.attHigh = True
-        self.medHigh = True
+        self.medHigh = False
 
         # Counter for enemy starting position (increased each new round)
         self.enemyPosition = ENEMY_DEFAULT_POSITION
@@ -365,6 +367,13 @@ class SpaceInvaders(object):
         self.enemy4Text = Text(FONT, 25, '   =  ?????', RED, 368, 420)
         self.scoreText = Text(FONT, 20, 'Score', WHITE, 5, 5)
         self.livesText = Text(FONT, 20, 'Lives ', WHITE, 640, 5)
+
+        # For math practice use
+        self.titleMath = Text(FONT, 40, 'Practice Math before game!', WHITE, 70, 70)
+        self.titleMath2 = Text(FONT, 25, 'press space for next question', WHITE, 160, 120)
+        self.attMath = Text(FONT, 25, 'Attention  :', GREEN, 280, 450)
+        self.medMath = Text(FONT, 25, 'Meditation:', GREEN, 280, 500)
+
         # Display attention value on screen
         self.attentionText = Text(FONT, 20, 'Attention', WHITE, 180, 5)
         self.meditationText = Text(FONT, 20, 'Meditation', WHITE, 395, 5)
@@ -392,19 +401,52 @@ class SpaceInvaders(object):
                 self.enemy3Text.draw(self.screen)
                 self.enemy4Text.draw(self.screen)
                 self.create_main_menu()
+
+                for e in event.get():
+                    if self.should_exit(e): #QUIT or escape key to quit
+                        sys.exit()
+                    if e.type == KEYUP:
+                        self.numQuestions = 5
+                        self.make_math_problem()
+                        self.numQuestions -= 1
+                        self.mathScreen = True
+                        self.mainScreen = False
+
+            # Practice Math Screen
+            elif self.mathScreen:
+                self.screen.blit(self.background, (0, 0))
+                self.titleMath.draw(self.screen)
+                self.titleMath2.draw(self.screen)
+                self.attMath.draw(self.screen)
+                self.medMath.draw(self.screen)
+                self.problemText = Text(FONT, 50, self.problem , WHITE, 200, 225)
+                self.problemText.draw(self.screen)
+                '''
+                self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), WHITE, 480, 450)
+                self.medMathValue = Text(FONT, 25, str(self.neuropy.meditation), WHITE, 480, 500)
+                '''
+                self.attMathValue = Text(FONT, 25, '77', WHITE, 480, 450)
+                self.medMathValue = Text(FONT, 25, '88', WHITE, 480, 500)
+                self.attMathValue.draw(self.screen)
+                self.medMathValue.draw(self.screen)
+
                 for e in event.get():
                     if self.should_exit(e):
                         sys.exit()
                     if e.type == KEYUP:
-                        # Only create blockers on a new game, not a new round
-                        self.allBlockers = sprite.Group(self.make_blockers(0),
-                                                        self.make_blockers(1),
-                                                        self.make_blockers(2),
-                                                        self.make_blockers(3))
-                        self.livesGroup.add(self.life1, self.life2, self.life3)
-                        self.reset(0)
-                        self.startGame = True
-                        self.mainScreen = False
+                        if self.numQuestions > 0:
+                            self.make_math_problem()
+                            self.numQuestions -= 1
+                        else: # Only create blockers on a new game, not a new round
+                            self.allBlockers = sprite.Group(self.make_blockers(0),
+                                                            self.make_blockers(1),
+                                                            self.make_blockers(2),
+                                                            self.make_blockers(3))
+                            self.livesGroup.add(self.life1, self.life2, self.life3)
+                            self.reset(0)
+                            self.startGame = True
+                            self.mathScreen = False
+
             # Game Plaing screen
             elif self.startGame:
                 # When winning game and going to next round
@@ -483,6 +525,12 @@ class SpaceInvaders(object):
 
             display.update()
             self.clock.tick(60)
+
+    def make_math_problem(self):
+        num1 = str(random.randint(1,99))
+        num2 = str(random.randint(1,99))
+        symbol = ' + ' if random.randint(0,1) == 0 else ' - '
+        self.problem = num1 + symbol + num2 + ' = ???'
 
     def make_enemies_shoot(self):
         if (time.get_ticks() - self.timer) > 700 and self.enemies:
