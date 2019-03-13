@@ -7,7 +7,7 @@ from pygame import *
 import sys
 from os.path import abspath, dirname
 from random import choice
-from neurpy import Neuropy
+from NeuroPy import NeuroPy
 from time import sleep
 
 BASE_PATH = abspath(dirname(__file__))
@@ -367,7 +367,7 @@ class SpaceInvaders(object):
         self.livesGroup = sprite.Group(self.life1, self.life2, self.life3)
 
         # Neuropy object to extract brainwave value
-        self.neuropy = Neuropy(PORT1, PORT2)
+        self.neuropy = NeuroPy(PORT1, PORT2)
         self.neuropy.start()
 
     def main(self):
