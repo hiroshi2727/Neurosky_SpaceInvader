@@ -345,6 +345,13 @@ class SpaceInvaders(object):
         self.startGame = False
         self.mainScreen = True
         self.gameOver = False
+
+        # Initial values for attention and meditation thresholds
+        self.attThreshold = 0
+        self.medThreshold = 0
+        self.attHigh = True
+        self.medHigh = True
+
         # Counter for enemy starting position (increased each new round)
         self.enemyPosition = ENEMY_DEFAULT_POSITION
         self.titleText = Text(FONT, 50, 'Space Invaders', WHITE, 164, 155)
@@ -358,8 +365,9 @@ class SpaceInvaders(object):
         self.enemy4Text = Text(FONT, 25, '   =  ?????', RED, 368, 420)
         self.scoreText = Text(FONT, 20, 'Score', WHITE, 5, 5)
         self.livesText = Text(FONT, 20, 'Lives ', WHITE, 640, 5)
-        # Display attention value on screen !!change x position
-        self.attentionText = Text(FONT, 20, 'Attention', WHITE, 300, 5)
+        # Display attention value on screen
+        self.attentionText = Text(FONT, 20, 'Attention', WHITE, 180, 5)
+        self.meditationText = Text(FONT, 20, 'Meditation', WHITE, 395, 5)
 
         self.life1 = Life(715, 3)
         self.life2 = Life(742, 3)
@@ -367,8 +375,10 @@ class SpaceInvaders(object):
         self.livesGroup = sprite.Group(self.life1, self.life2, self.life3)
 
         # Neuropy object to extract brainwave value
+        '''
         self.neuropy = NeuroPy(PORT1, PORT2)
         self.neuropy.start()
+        '''
 
     def main(self):
         while True:
@@ -425,12 +435,37 @@ class SpaceInvaders(object):
                     self.scoreText.draw(self.screen)
                     self.scoreText2.draw(self.screen)
 
-                    # Draw neuropy text and value
-                    self.attentionText2 = Text(FONT, 20, str(self.neuropy.attention),
-                                                GREEN, 440, 5)
-                    self.attentionText.draw(self.screen)
-                    self.attentionText2.draw(self.screen)
+                    '''
+                    # Check if att and med are above threshold value
+                    attHigh = True if self.neuropy.attention >= attThreshold else False
+                    medHigh = True if self.neuropy.meditation >= attThreshold else False
+                    '''
 
+                    # Draw neuropy text and value
+                    attColor = GREEN
+                    medColor = GREEN
+                    if self.attHigh:
+                        attColor = RED
+                    if self.medHigh:
+                        medColor = RED
+                    '''
+                    self.attentionText2 = Text(FONT, 20, str(self.neuropy.attention),
+                                                attColor, 320, 5)
+                    self.meditationText2 = Text(FONT, 20, str(self.neuropy.meditation),
+                                                medColor, 545, 5)
+                    self.attentionText2.draw(self.screen)
+                    self.meditationText2.draw(self.screen)
+                    '''
+                    self.attentionText.draw(self.screen)
+                    self.meditationText.draw(self.screen)
+
+                    # to be deleted
+                    self.hoge1 = Text(FONT, 20, '77', attColor, 320, 5)
+                    self.hoge2 = Text(FONT, 20, '88', medColor, 545, 5)
+                    self.hoge1.draw(self.screen)
+                    self.hoge2.draw(self.screen)
+
+                    # Check some conditions
                     self.livesText.draw(self.screen)
                     self.check_input()
                     self.enemies.update(currentTime)
@@ -449,6 +484,24 @@ class SpaceInvaders(object):
             display.update()
             self.clock.tick(60)
 
+    def make_enemies_shoot(self):
+        if (time.get_ticks() - self.timer) > 700 and self.enemies:
+            if self.medHigh:
+                for i in range(5):
+                    #TODO: need to change random_bottom to avoid same colomn selection
+                    enemy = self.enemies.random_bottom()
+                    self.enemyBullets.add(
+                        Bullet(enemy.rect.x + 14, enemy.rect.y + 20, 1, 5,
+                               'enemylaser', 'center'))
+                    self.allSprites.add(self.enemyBullets)
+            else:
+                enemy = self.enemies.random_bottom()
+                self.enemyBullets.add(
+                    Bullet(enemy.rect.x + 14, enemy.rect.y + 20, 1, 5,
+                           'enemylaser', 'center'))
+                self.allSprites.add(self.enemyBullets)
+            self.timer = time.get_ticks()
+
     def check_input(self):
         self.keys = key.get_pressed()
         for e in event.get():
@@ -457,8 +510,9 @@ class SpaceInvaders(object):
             if e.type == KEYDOWN:
                 if e.key == K_SPACE:
                     if len(self.bullets) == 0 and self.shipAlive:
-                        if self.neuropy.attention > 50:
-                            for i in range(6):
+                        # Special shoot when attention is high
+                        if self.attHigh:
+                            for i in range(5):
                                 speed = 15 - i
                                 bullet = Bullet(self.player.rect.x + 23,
                                                 self.player.rect.y + 5, -1,
@@ -466,6 +520,7 @@ class SpaceInvaders(object):
                                 self.bullets.add(bullet)
                             self.allSprites.add(self.bullets)
                             self.sounds['shoot2'].play()
+                        # Normal shoot
                         else:
                             bullet = Bullet(self.player.rect.x + 23,
                                             self.player.rect.y + 5, -1,
@@ -473,20 +528,6 @@ class SpaceInvaders(object):
                             self.bullets.add(bullet)
                             self.allSprites.add(self.bullets)
                             self.sounds['shoot'].play()
-
-                        ''' Comment out for convinience
-                        else:
-                            leftbullet = Bullet(self.player.rect.x + 8,
-                                                self.player.rect.y + 5, -1,
-                                                15, 'laser', 'left')
-                            rightbullet = Bullet(self.player.rect.x + 38,
-                                                 self.player.rect.y + 5, -1,
-                                                 15, 'laser', 'right')
-                            self.bullets.add(leftbullet)
-                            self.bullets.add(rightbullet)
-                            self.allSprites.add(self.bullets)
-                            self.sounds['shoot2'].play()
-                        '''
 
     def reset(self, score):
         self.player = Ship()
@@ -560,15 +601,6 @@ class SpaceInvaders(object):
                 enemies.add(enemy)
 
         self.enemies = enemies
-
-    def make_enemies_shoot(self):
-        if (time.get_ticks() - self.timer) > 700 and self.enemies:
-            enemy = self.enemies.random_bottom()
-            self.enemyBullets.add(
-                Bullet(enemy.rect.x + 14, enemy.rect.y + 20, 1, 5,
-                       'enemylaser', 'center'))
-            self.allSprites.add(self.enemyBullets)
-            self.timer = time.get_ticks()
 
     def calculate_score(self, row):
         scores = {0: 30,
