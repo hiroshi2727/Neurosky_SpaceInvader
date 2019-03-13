@@ -421,14 +421,13 @@ class SpaceInvaders(object):
                     self.play_main_music(currentTime)
                     self.screen.blit(self.background, (0, 0))
                     self.allBlockers.update(self.screen)
-                    self.scoreText2 = Text(FONT, 20, str(self.score), GREEN,
-                                           85, 5)
+                    self.scoreText2 = Text(FONT, 20, str(self.score), GREEN, 85, 5)
                     self.scoreText.draw(self.screen)
                     self.scoreText2.draw(self.screen)
+
                     # Draw neuropy text and value
-                    self.attentionText2 = Text(FONT, 20,
-                                            str(self.neuropy.attention), GREEN,
-                                            380, 5)
+                    self.attentionText2 = Text(FONT, 20, str(self.neuropy.attention),
+                                                GREEN, 440, 5)
                     self.attentionText.draw(self.screen)
                     self.attentionText2.draw(self.screen)
 
@@ -449,6 +448,45 @@ class SpaceInvaders(object):
 
             display.update()
             self.clock.tick(60)
+
+    def check_input(self):
+        self.keys = key.get_pressed()
+        for e in event.get():
+            if self.should_exit(e):
+                sys.exit()
+            if e.type == KEYDOWN:
+                if e.key == K_SPACE:
+                    if len(self.bullets) == 0 and self.shipAlive:
+                        if self.neuropy.attention > 50:
+                            for i in range(6):
+                                speed = 15 - i
+                                bullet = Bullet(self.player.rect.x + 23,
+                                                self.player.rect.y + 5, -1,
+                                                speed, 'laser', 'center')
+                                self.bullets.add(bullet)
+                            self.allSprites.add(self.bullets)
+                            self.sounds['shoot2'].play()
+                        else:
+                            bullet = Bullet(self.player.rect.x + 23,
+                                            self.player.rect.y + 5, -1,
+                                            15, 'laser', 'center')
+                            self.bullets.add(bullet)
+                            self.allSprites.add(self.bullets)
+                            self.sounds['shoot'].play()
+
+                        ''' Comment out for convinience
+                        else:
+                            leftbullet = Bullet(self.player.rect.x + 8,
+                                                self.player.rect.y + 5, -1,
+                                                15, 'laser', 'left')
+                            rightbullet = Bullet(self.player.rect.x + 38,
+                                                 self.player.rect.y + 5, -1,
+                                                 15, 'laser', 'right')
+                            self.bullets.add(leftbullet)
+                            self.bullets.add(rightbullet)
+                            self.allSprites.add(self.bullets)
+                            self.sounds['shoot2'].play()
+                        '''
 
     def reset(self, score):
         self.player = Ship()
@@ -511,33 +549,6 @@ class SpaceInvaders(object):
     def should_exit(evt):
         # type: (pygame.event.EventType) -> bool
         return evt.type == QUIT or (evt.type == KEYUP and evt.key == K_ESCAPE)
-
-    def check_input(self):
-        self.keys = key.get_pressed()   # Change this part to blink value
-        for e in event.get():
-            if self.should_exit(e):
-                sys.exit()
-            if e.type == KEYDOWN:
-                if e.key == K_SPACE:
-                    if len(self.bullets) == 0 and self.shipAlive:
-                        if self.score < 1000:
-                            bullet = Bullet(self.player.rect.x + 23,
-                                            self.player.rect.y + 5, -1,
-                                            15, 'laser', 'center')
-                            self.bullets.add(bullet)
-                            self.allSprites.add(self.bullets)
-                            self.sounds['shoot'].play()
-                        else:
-                            leftbullet = Bullet(self.player.rect.x + 8,
-                                                self.player.rect.y + 5, -1,
-                                                15, 'laser', 'left')
-                            rightbullet = Bullet(self.player.rect.x + 38,
-                                                 self.player.rect.y + 5, -1,
-                                                 15, 'laser', 'right')
-                            self.bullets.add(leftbullet)
-                            self.bullets.add(rightbullet)
-                            self.allSprites.add(self.bullets)
-                            self.sounds['shoot2'].play()
 
     def make_enemies(self):
         enemies = EnemiesGroup(10, 5)
