@@ -349,9 +349,11 @@ class SpaceInvaders(object):
         self.mathScreen = False
 
         # Initial values for attention and meditation thresholds
+        self.attPractice = list()
+        self.medPractice = list()
         self.attThreshold = 0
         self.medThreshold = 0
-        self.attHigh = True
+        self.attHigh = False
         self.medHigh = False
 
         # Counter for enemy starting position (increased each new round)
@@ -384,10 +386,8 @@ class SpaceInvaders(object):
         self.livesGroup = sprite.Group(self.life1, self.life2, self.life3)
 
         # Neuropy object to extract brainwave value
-        '''
         self.neuropy = NeuroPy(PORT1, PORT2)
         self.neuropy.start()
-        '''
 
     def main(self):
         while True:
@@ -421,14 +421,20 @@ class SpaceInvaders(object):
                 self.medMath.draw(self.screen)
                 self.problemText = Text(FONT, 50, self.problem , WHITE, 200, 225)
                 self.problemText.draw(self.screen)
-                '''
+
+                # Neuropy values
                 self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), WHITE, 480, 450)
                 self.medMathValue = Text(FONT, 25, str(self.neuropy.meditation), WHITE, 480, 500)
                 '''
                 self.attMathValue = Text(FONT, 25, '77', WHITE, 480, 450)
                 self.medMathValue = Text(FONT, 25, '88', WHITE, 480, 500)
+                self.attPractice.append(random.randint(1,99))
+                self.medPractice.append(random.randint(1,99))
+                '''
                 self.attMathValue.draw(self.screen)
                 self.medMathValue.draw(self.screen)
+                self.attPractice.append(self.neuropy.attention)
+                self.medPractice.append(self.neuropy.meditation)
 
                 for e in event.get():
                     if self.should_exit(e):
@@ -438,6 +444,12 @@ class SpaceInvaders(object):
                             self.make_math_problem()
                             self.numQuestions -= 1
                         else: # Only create blockers on a new game, not a new round
+                            self.attThreshold = int(sum(self.attPractice)/len(self.attPractice))
+                            self.medThreshold = int(sum(self.medPractice)/len(self.medPractice))
+                            self.attPractice = list()
+                            self.medPractice = list()
+                            print "attention threshold is " + str(self.attThreshold)
+                            print "meditation threshold is " + str(self.medThreshold)
                             self.allBlockers = sprite.Group(self.make_blockers(0),
                                                             self.make_blockers(1),
                                                             self.make_blockers(2),
@@ -477,11 +489,9 @@ class SpaceInvaders(object):
                     self.scoreText.draw(self.screen)
                     self.scoreText2.draw(self.screen)
 
-                    '''
                     # Check if att and med are above threshold value
-                    attHigh = True if self.neuropy.attention >= attThreshold else False
-                    medHigh = True if self.neuropy.meditation >= attThreshold else False
-                    '''
+                    self.attHigh = True if self.neuropy.attention >= attThreshold else False
+                    self.medHigh = True if self.neuropy.meditation >= attThreshold else False
 
                     # Draw neuropy text and value
                     attColor = GREEN
@@ -490,22 +500,21 @@ class SpaceInvaders(object):
                         attColor = RED
                     if self.medHigh:
                         medColor = RED
-                    '''
                     self.attentionText2 = Text(FONT, 20, str(self.neuropy.attention),
                                                 attColor, 320, 5)
                     self.meditationText2 = Text(FONT, 20, str(self.neuropy.meditation),
                                                 medColor, 545, 5)
                     self.attentionText2.draw(self.screen)
                     self.meditationText2.draw(self.screen)
-                    '''
                     self.attentionText.draw(self.screen)
                     self.meditationText.draw(self.screen)
 
-                    # to be deleted
+                    '''
                     self.hoge1 = Text(FONT, 20, '77', attColor, 320, 5)
                     self.hoge2 = Text(FONT, 20, '88', medColor, 545, 5)
                     self.hoge1.draw(self.screen)
                     self.hoge2.draw(self.screen)
+                    '''
 
                     # Check some conditions
                     self.livesText.draw(self.screen)
@@ -536,7 +545,6 @@ class SpaceInvaders(object):
         if (time.get_ticks() - self.timer) > 700 and self.enemies:
             if self.medHigh:
                 for i in range(5):
-                    #TODO: need to change random_bottom to avoid same colomn selection
                     enemy = self.enemies.random_bottom()
                     self.enemyBullets.add(
                         Bullet(enemy.rect.x + 14, enemy.rect.y + 20, 1, 5,
