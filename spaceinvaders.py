@@ -433,8 +433,10 @@ class SpaceInvaders(object):
                 '''
                 self.attMathValue.draw(self.screen)
                 self.medMathValue.draw(self.screen)
-                self.attPractice.append(self.neuropy.attention)
-                self.medPractice.append(self.neuropy.meditation)
+                if self.neuropy.attention > 0:
+                    self.attPractice.append(self.neuropy.attention)
+                if self.neuropy.meditation > 0:
+                    self.medPractice.append(self.neuropy.meditation)
 
                 for e in event.get():
                     if self.should_exit(e):
