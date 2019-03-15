@@ -493,7 +493,7 @@ class SpaceInvaders(object):
 
                     # Check if att and med are above threshold value
                     self.attHigh = True if self.neuropy.attention >= self.attThreshold else False
-                    self.medHigh = True if self.neuropy.meditation >= self.attThreshold else False
+                    self.medHigh = True if self.neuropy.meditation >= self.medThreshold else False
 
                     # Draw neuropy text and value
                     attColor = GREEN
