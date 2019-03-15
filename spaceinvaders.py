@@ -500,7 +500,7 @@ class SpaceInvaders(object):
 
                     # Check if att and med are above threshold value
                     self.attHigh = True if self.neuropy.attention >= self.attThreshold else False
-                    self.medHigh = True if self.neuropy.meditation >= self.medThreshold else False
+                    self.medHigh = True if self.neuropy.meditation <= self.medThreshold else False
 
                     # Draw neuropy text and value
                     attColor = GREEN
@@ -553,7 +553,7 @@ class SpaceInvaders(object):
     def make_enemies_shoot(self):
         if (time.get_ticks() - self.timer) > 700 and self.enemies:
             if self.medHigh:
-                for i in range(5):
+                for i in range(3):
                     enemy = self.enemies.random_bottom()
                     self.enemyBullets.add(
                         Bullet(enemy.rect.x + 14, enemy.rect.y + 20, 1, 5,
