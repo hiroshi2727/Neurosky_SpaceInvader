@@ -372,7 +372,7 @@ class SpaceInvaders(object):
 
         # For math practice use
         self.titleMath = Text(FONT, 40, 'Practice Math before game!', WHITE, 70, 70)
-        self.titleMath2 = Text(FONT, 25, 'press space for next question', WHITE, 160, 120)
+        self.titleMath2 = Text(FONT, 25, 'press any key for next question', WHITE, 160, 120)
         self.attMath = Text(FONT, 25, 'Attention  :', GREEN, 280, 450)
         self.medMath = Text(FONT, 25, 'Meditation:', GREEN, 280, 500)
 
@@ -409,6 +409,7 @@ class SpaceInvaders(object):
                         self.numQuestions = 5
                         self.make_math_problem()
                         self.numQuestions -= 1
+                        self.numQueStr = str(self.numQuestions) + " more question"
                         self.mathScreen = True
                         self.mainScreen = False
 
@@ -419,8 +420,10 @@ class SpaceInvaders(object):
                 self.titleMath2.draw(self.screen)
                 self.attMath.draw(self.screen)
                 self.medMath.draw(self.screen)
-                self.problemText = Text(FONT, 50, self.problem , WHITE, 200, 225)
+                self.problemText = Text(FONT, 50, self.problem, WHITE, 200, 225)
                 self.problemText.draw(self.screen)
+                self.numQuestionText = Text(FONT, 25, self.numQueStr, RED, 270, 150)
+                self.numQuestionText.draw(self.screen)
 
                 # Neuropy values
                 self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), WHITE, 480, 450)
@@ -445,6 +448,10 @@ class SpaceInvaders(object):
                         if self.numQuestions > 0:
                             self.make_math_problem()
                             self.numQuestions -= 1
+                            if self.numQuestions == 0:
+                                self.numQueStr = "last question"
+                            else:
+                                self.numQueStr = str(self.numQuestions) + " more question"
                         else: # Only create blockers on a new game, not a new round
                             self.attThreshold = int(sum(self.attPractice)/len(self.attPractice))
                             self.medThreshold = int(sum(self.medPractice)/len(self.medPractice))
