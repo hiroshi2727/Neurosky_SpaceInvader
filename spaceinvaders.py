@@ -437,8 +437,8 @@ class SpaceInvaders(object):
                 # Neuropy values
                 ##self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), GREEN, 480, 450)
                 ##self.medMathValue = Text(FONT, 25, str(self.neuropy.meditation), GREEN, 480, 500)
-                self.attMathValue = Text(FONT, 25, '77', WHITE, 480, 450)
-                self.medMathValue = Text(FONT, 25, '88', WHITE, 480, 500)
+                self.attMathValue = Text(FONT, 25, '63', WHITE, 480, 450)
+                self.medMathValue = Text(FONT, 25, '42', WHITE, 480, 500)
                 self.attPractice.append(random.randint(1,99))
                 self.medPractice.append(random.randint(1,99))
                 self.attMathValue.draw(self.screen)
