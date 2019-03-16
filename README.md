@@ -17,7 +17,7 @@ Neurosky Mindwave Headset
 ```
 pip install pyserial
 ```
-6) Adjust the variable "PORT 1" to your COM or dev location  
+6) Change the variable "PORT 1" in line 17 of spaceinvader.py to your COM or dev location  
 7) Run the following line:
 ```
 python spaceinvaders.py
