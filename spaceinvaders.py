@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-# Space Invaders
-# Created by Lee Robinson
-
 from pygame import *
 import sys
 from os.path import abspath, dirname
@@ -343,10 +340,11 @@ class SpaceInvaders(object):
         self.caption = display.set_caption('Space Invaders')
         self.screen = SCREEN
         self.background = image.load(IMAGE_PATH + 'background.jpg').convert()
-        self.startGame = False
         self.mainScreen = True
-        self.gameOver = False
         self.mathScreen = False
+        self.levelScreen = False
+        self.startGame = False
+        self.gameOver = False
 
         # Initial values for attention and meditation thresholds
         self.attPractice = list()
@@ -354,7 +352,7 @@ class SpaceInvaders(object):
         self.attThreshold = 0
         self.medThreshold = 0
         self.attHigh = False
-        self.medHigh = False
+        self.medHigh = True
 
         # Counter for enemy starting position (increased each new round)
         self.enemyPosition = ENEMY_DEFAULT_POSITION
@@ -371,15 +369,25 @@ class SpaceInvaders(object):
         self.livesText = Text(FONT, 20, 'Lives ', WHITE, 640, 5)
 
         # For math practice use
-        self.titleMath = Text(FONT, 40, 'Practice Math before game!', WHITE, 70, 70)
-        self.titleMath2 = Text(FONT, 25, 'press any key for next question', WHITE, 160, 120)
+        self.titleMath = Text(FONT, 40, 'practice before game!', WHITE, 130, 70)
+        self.titleMath2 = Text(FONT, 25, 'press any key to next question', WHITE, 160, 120)
         self.attMath = Text(FONT, 25, 'Attention  :', GREEN, 280, 450)
         self.medMath = Text(FONT, 25, 'Meditation:', GREEN, 280, 500)
+
+        # For level screen use
+        self.titleLevel = Text(FONT, 40, 'select game level', WHITE, 170, 70)
+        self.titleLevel2 = Text(FONT, 20, 'enter number between 1 and 6 and return', WHITE, 150, 120)
+        self.attThText = Text(FONT, 25, 'Attention Threshold :', RED, 200, 450)
+        self.medThText = Text(FONT, 25, 'Meditation Threshold :', RED, 200, 500)
+        self.intList = [K_1, K_2, K_3, K_4, K_5, K_6]
+        self.level = 0
+        self.levelSet = False
 
         # Display attention value on screen
         self.attentionText = Text(FONT, 20, 'Attention', WHITE, 180, 5)
         self.meditationText = Text(FONT, 20, 'Meditation', WHITE, 395, 5)
 
+        # Life symbols
         self.life1 = Life(715, 3)
         self.life2 = Life(742, 3)
         self.life3 = Life(769, 3)
@@ -402,6 +410,7 @@ class SpaceInvaders(object):
                 self.enemy4Text.draw(self.screen)
                 self.create_main_menu()
 
+                # Keyboard input handling
                 for e in event.get():
                     if self.should_exit(e): #QUIT or escape key to quit
                         sys.exit()
@@ -420,14 +429,14 @@ class SpaceInvaders(object):
                 self.titleMath2.draw(self.screen)
                 self.attMath.draw(self.screen)
                 self.medMath.draw(self.screen)
-                self.problemText = Text(FONT, 50, self.problem, WHITE, 200, 225)
+                self.problemText = Text(FONT, 50, self.problem, WHITE, 230, 280)
                 self.problemText.draw(self.screen)
                 self.numQuestionText = Text(FONT, 25, self.numQueStr, RED, 270, 150)
                 self.numQuestionText.draw(self.screen)
 
                 # Neuropy values
-                self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), WHITE, 480, 450)
-                self.medMathValue = Text(FONT, 25, str(self.neuropy.meditation), WHITE, 480, 500)
+                self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), GREEN, 480, 450)
+                self.medMathValue = Text(FONT, 25, str(self.neuropy.meditation), GREEN, 480, 500)
                 '''
                 self.attMathValue = Text(FONT, 25, '77', WHITE, 480, 450)
                 self.medMathValue = Text(FONT, 25, '88', WHITE, 480, 500)
@@ -436,11 +445,13 @@ class SpaceInvaders(object):
                 '''
                 self.attMathValue.draw(self.screen)
                 self.medMathValue.draw(self.screen)
+
                 if self.neuropy.attention > 0:
                     self.attPractice.append(self.neuropy.attention)
                 if self.neuropy.meditation > 0:
                     self.medPractice.append(self.neuropy.meditation)
 
+                # Keyboard input handling
                 for e in event.get():
                     if self.should_exit(e):
                         sys.exit()
@@ -452,13 +463,31 @@ class SpaceInvaders(object):
                                 self.numQueStr = "last question"
                             else:
                                 self.numQueStr = str(self.numQuestions) + " more question"
-                        else: # Only create blockers on a new game, not a new round
+                        else:
                             self.attThreshold = int(sum(self.attPractice)/len(self.attPractice))
                             self.medThreshold = int(sum(self.medPractice)/len(self.medPractice))
                             self.attPractice = list()
                             self.medPractice = list()
-                            print "attention threshold is " + str(self.attThreshold)
-                            print "meditation threshold is " + str(self.medThreshold)
+                            self.attThVal = Text(FONT, 25, str(self.attThreshold), WHITE, 580, 450)
+                            self.medThVal = Text(FONT, 25, str(self.medThreshold), WHITE, 580, 500)
+                            self.levelScreen = True
+                            self.mathScreen = False
+
+            elif self.levelScreen:
+                self.screen.blit(self.background, (0, 0))
+                self.titleLevel.draw(self.screen)
+                self.titleLevel2.draw(self.screen)
+                self.attThText.draw(self.screen)
+                self.medThText.draw(self.screen)
+                self.attThVal.draw(self.screen)
+                self.medThVal.draw(self.screen)
+                if self.levelSet:
+                    self.levelText.draw(self.screen)
+                for e in event.get():
+                    if self.should_exit(e):
+                        sys.exit()
+                    if e.type == KEYUP:
+                        if self.levelSet and e.key == K_RETURN: # Start Game
                             self.allBlockers = sprite.Group(self.make_blockers(0),
                                                             self.make_blockers(1),
                                                             self.make_blockers(2),
@@ -466,10 +495,15 @@ class SpaceInvaders(object):
                             self.livesGroup.add(self.life1, self.life2, self.life3)
                             self.reset(0)
                             self.startGame = True
-                            self.mathScreen = False
+                            self.levelScreen = False
+                        elif not self.levelSet and e.key in self.intList:
+                                # input number = number of enermy bullets
+                                self.level = e.key - 48 # extract the key number
+                                levelStr = "level " + str(self.level)
+                                self.levelText = Text(FONT, 70, levelStr, GREEN, 240, 250)
+                                self.levelSet = True
 
-            # Game Plaing screen
-            elif self.startGame:
+            elif self.startGame: # Game Plaing screen
                 # When winning game and going to next round
                 if not self.enemies and not self.explosionsGroup:
                     currentTime = time.get_ticks()
@@ -484,7 +518,6 @@ class SpaceInvaders(object):
                         self.livesGroup.update()
                         self.check_input()
                     if currentTime - self.gameTimer > 3000:
-                        # Move enemies closer to bottom
                         self.enemyPosition += ENEMY_MOVE_DOWN
                         self.reset(self.score)
                         self.gameTimer += 3000
@@ -499,8 +532,8 @@ class SpaceInvaders(object):
                     self.scoreText2.draw(self.screen)
 
                     # Check if att and med are above threshold value
-                    self.attHigh = True if self.neuropy.attention >= self.attThreshold else False
-                    self.medHigh = True if self.neuropy.meditation <= self.medThreshold else False
+                    #self.attHigh = True if self.neuropy.attention >= self.attThreshold else False
+                    #self.medHigh = True if self.neuropy.meditation <= self.medThreshold else False
 
                     # Draw neuropy text and value
                     attColor = GREEN
@@ -517,10 +550,9 @@ class SpaceInvaders(object):
                     self.meditationText2.draw(self.screen)
                     self.attentionText.draw(self.screen)
                     self.meditationText.draw(self.screen)
-
                     '''
                     self.hoge1 = Text(FONT, 20, '77', attColor, 320, 5)
-                    self.hoge2 = Text(FONT, 20, '88', medColor, 545, 5)
+                    self.hoge2 = Text(FONT, 20, '100', medColor, 545, 5)
                     self.hoge1.draw(self.screen)
                     self.hoge2.draw(self.screen)
                     '''
@@ -553,7 +585,7 @@ class SpaceInvaders(object):
     def make_enemies_shoot(self):
         if (time.get_ticks() - self.timer) > 700 and self.enemies:
             if self.medHigh:
-                for i in range(3):
+                for i in range(self.level):
                     enemy = self.enemies.random_bottom()
                     self.enemyBullets.add(
                         Bullet(enemy.rect.x + 14, enemy.rect.y + 20, 1, 5,
@@ -767,7 +799,6 @@ class SpaceInvaders(object):
         for e in event.get():
             if self.should_exit(e):
                 sys.exit()
-
 
 if __name__ == '__main__':
     game = SpaceInvaders()
