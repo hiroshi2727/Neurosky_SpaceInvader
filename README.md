@@ -1,15 +1,17 @@
 # Neurosky_SpaceInvader
+## About
 COGS 189 class project which uses neurosky mindwave headset to play space invader game in python.  
 Original code from: https://github.com/leerob/Space_Invaders.  
+![alt text](https://github.com/hiroshi2727/Neurosky_SpaceInvader/blob/master/images/playing_game.png)
 
-# Requirements
+## Requirements
 Windows PC  
 Python 2.7.15  
 Pygame 1.9.4  
 NeuroPy 0.1  
 Neurosky Mindwave Headset  
 
-# Set up  
+## Set Up  
 1) Create a conda Python 2.7.15 environment  
 2) Download and extract the NeuroPy.zip from: https://github.com/lihas/NeuroPy/tree/master/dist  
 3) Extract the zip, and navigate to the directory with the command prompt
@@ -23,3 +25,4 @@ pip install pyserial
 ```
 python spaceinvaders.py
 ```
+
