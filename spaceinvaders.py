@@ -351,7 +351,7 @@ class SpaceInvaders(object):
         self.medPractice = list()
         self.attThreshold = 0
         self.medThreshold = 0
-        self.attHigh = False
+        self.attHigh = True
         self.medHigh = True
 
         # Counter for enemy starting position (increased each new round)
@@ -394,8 +394,8 @@ class SpaceInvaders(object):
         self.livesGroup = sprite.Group(self.life1, self.life2, self.life3)
 
         # Neuropy object to extract brainwave value
-        self.neuropy = NeuroPy(PORT1, PORT2)
-        self.neuropy.start()
+        ##self.neuropy = NeuroPy(PORT1, PORT2)
+        ##self.neuropy.start()
 
     def main(self):
         while True:
@@ -435,21 +435,21 @@ class SpaceInvaders(object):
                 self.numQuestionText.draw(self.screen)
 
                 # Neuropy values
-                self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), GREEN, 480, 450)
-                self.medMathValue = Text(FONT, 25, str(self.neuropy.meditation), GREEN, 480, 500)
-                '''
+                ##self.attMathValue = Text(FONT, 25, str(self.neuropy.attention), GREEN, 480, 450)
+                ##self.medMathValue = Text(FONT, 25, str(self.neuropy.meditation), GREEN, 480, 500)
                 self.attMathValue = Text(FONT, 25, '77', WHITE, 480, 450)
                 self.medMathValue = Text(FONT, 25, '88', WHITE, 480, 500)
                 self.attPractice.append(random.randint(1,99))
                 self.medPractice.append(random.randint(1,99))
-                '''
                 self.attMathValue.draw(self.screen)
                 self.medMathValue.draw(self.screen)
 
+                '''##
                 if self.neuropy.attention > 0:
                     self.attPractice.append(self.neuropy.attention)
                 if self.neuropy.meditation > 0:
                     self.medPractice.append(self.neuropy.meditation)
+                '''
 
                 # Keyboard input handling
                 for e in event.get():
@@ -542,20 +542,20 @@ class SpaceInvaders(object):
                         attColor = RED
                     if self.medHigh:
                         medColor = RED
+                    '''##
                     self.attentionText2 = Text(FONT, 20, str(self.neuropy.attention),
                                                 attColor, 320, 5)
                     self.meditationText2 = Text(FONT, 20, str(self.neuropy.meditation),
                                                 medColor, 545, 5)
                     self.attentionText2.draw(self.screen)
                     self.meditationText2.draw(self.screen)
+                    '''
                     self.attentionText.draw(self.screen)
                     self.meditationText.draw(self.screen)
-                    '''
                     self.hoge1 = Text(FONT, 20, '77', attColor, 320, 5)
-                    self.hoge2 = Text(FONT, 20, '100', medColor, 545, 5)
+                    self.hoge2 = Text(FONT, 20, '63', medColor, 545, 5)
                     self.hoge1.draw(self.screen)
                     self.hoge2.draw(self.screen)
-                    '''
 
                     # Check some conditions
                     self.livesText.draw(self.screen)
