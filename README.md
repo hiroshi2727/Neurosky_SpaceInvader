@@ -2,7 +2,7 @@
 ## About
 COGS 189 class project which uses neurosky mindwave headset to play space invader game in python.  
 Original code from: https://github.com/leerob/Space_Invaders.  
-![alt text](https://github.com/hiroshi2727/Neurosky_SpaceInvader/blob/master/images/playing_game.png = 532x397)
+![](https://github.com/hiroshi2727/Neurosky_SpaceInvader/blob/master/images/playing_game.png = 532x397)
 
 ## Requirements
 Windows PC  
