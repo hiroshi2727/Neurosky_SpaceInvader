@@ -14,11 +14,11 @@ Neurosky Mindwave Headset
 3) Extract the zip, and navigate to the directory with the command prompt
 4) With your activated Python 2.7.15, run python setup.py install
 5) After NeuroPy is installed install pyserial via:
-'''
+```
 pip install pyserial
-'''
+```
 6) Adjust the variable "PORT 1" to your COM or dev location  
 7) Run the following line:
-'''
+```
 python spaceinvaders.py
-'''
+```
