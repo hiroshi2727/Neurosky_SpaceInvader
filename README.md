@@ -1,6 +1,6 @@
 # Neurosky_SpaceInvader
 ## About
-Project of COGS 189 class in UCSD which uses neurosky mindwave headset to play space invader game in python. In this project, we made the space invader game with which we can utilize your brain signal while playing game. You will get an advantage while your attention is high, and get a disadvantage when you upset (meditation is low).  
+Project of COGS 189 class in UCSD which uses neurosky mindwave headset to play space invader game in python. In this project, we made the space invader game with which we can utilize human brain signals while playing game. You will get an advantage while you focus on game (attention is high) and get a disadvantage when you lose your calm (meditation is low).  
 Original code of space invader from: https://github.com/leerob/Space_Invaders.  
   
 <img src="https://github.com/hiroshi2727/Neurosky_SpaceInvader/blob/master/images/playing_game.png" height="50%" width="50%"/>
