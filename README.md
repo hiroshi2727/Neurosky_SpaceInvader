@@ -4,7 +4,8 @@ Project of COGS 189 class in UCSD which uses neurosky mindwave headset to play s
 Original code of space invader from: https://github.com/leerob/Space_Invaders.  
   
 <img src="https://github.com/hiroshi2727/Neurosky_SpaceInvader/blob/master/images/playing_game.png" height="50%" width="50%"/>
-## Instruction  
+
+## Instruction
 First, you solve few math questions to decide attention and meditation threshold values.  
 Then, you choose the level of game between 1 and 6, and you can start to play game.
 While playing game, use arrow keys to move charater and space to shoot bullet(s).  
